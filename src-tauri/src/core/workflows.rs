@@ -65,6 +65,11 @@ impl WorkflowEngine {
                 }
             }
             if let Some(config_path) = &after_spicetify.spicetify.config_path {
+                if let Err(err) = spicetify::ensure_rxri_adblock_extension(config_path) {
+                    warnings.push(format!(
+                        "Could not download rxri adblockify extension: {err}"
+                    ));
+                }
                 if let Err(err) = spicetify::ensure_adblock_config(
                     config_path,
                     spicetify::MARKETPLACE_ADBLOCK_EXTENSION,
@@ -384,6 +389,9 @@ impl WorkflowEngine {
             }
         }
         if let Some(config_path) = &initial.spicetify.config_path {
+            if let Err(err) = spicetify::ensure_rxri_adblock_extension(config_path) {
+                warnings.push(format!("Adblock extension download failed: {err}"));
+            }
             if let Err(err) = spicetify::ensure_adblock_config(
                 config_path,
                 spicetify::MARKETPLACE_ADBLOCK_EXTENSION,

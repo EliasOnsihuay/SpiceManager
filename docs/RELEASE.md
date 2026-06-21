@@ -19,6 +19,16 @@ On Windows, this produces the desktop executable and installers:
 
 `spicemanager.exe` is the Tauri desktop app. `spicemanager-cli.exe` is the CLI/dev binary and should not be used as the desktop shortcut target.
 
+## Managed Adblock Extension
+
+SpiceManager currently installs and repairs rxri adblockify from:
+
+```text
+https://raw.githubusercontent.com/rxri/spicetify-extensions/main/adblock/adblock.js
+```
+
+If this upstream extension changes path or behavior, update `RXRI_ADBLOCK_SOURCE_URL` in `src-tauri/src/core/spicetify.rs`, run `npm run check`, then publish a patch release.
+
 ## GitHub Release Flow
 
 1. Update versions in `package.json`, `src-tauri/Cargo.toml`, and `src-tauri/tauri.conf.json`.

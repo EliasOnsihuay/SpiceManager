@@ -1,9 +1,11 @@
 use crate::errors::{Result, SpiceError};
 use crate::models::{ApplyAttempt, ApplyResult, ShellCommandResult};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub const MARKETPLACE_CUSTOM_APP: &str = "marketplace";
 pub const MARKETPLACE_ADBLOCK_EXTENSION: &str = "adblock.js";
+pub const RXRI_ADBLOCK_SOURCE_URL: &str =
+    "https://raw.githubusercontent.com/rxri/spicetify-extensions/main/adblock/adblock.js";
 
 pub fn install_spicetify() -> ShellCommandResult {
     if cfg!(target_os = "windows") {
@@ -74,6 +76,38 @@ pub fn ensure_adblock_config(config_path: &Path, extension_name: &str) -> Result
         std::fs::write(config_path, document.to_string())?;
     }
     Ok(changed)
+}
+
+pub fn ensure_rxri_adblock_extension(config_path: &Path) -> Result<PathBuf> {
+    let extension_dir = config_path
+        .parent()
+        .ok_or_else(|| SpiceError::Message("could not resolve Spicetify config directory".into()))?
+        .join("Extensions");
+    std::fs::create_dir_all(&extension_dir)?;
+    let target = extension_dir.join(MARKETPLACE_ADBLOCK_EXTENSION);
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("SpiceManager rxri-adblock-installer")
+        .build()?;
+    let content = client
+        .get(RXRI_ADBLOCK_SOURCE_URL)
+        .send()?
+        .error_for_status()?
+        .text()?;
+    if !content.contains("adblockify") && !content.contains("Spicetify") {
+        return Err(SpiceError::Message(
+            "downloaded adblock extension did not look like a Spicetify extension".into(),
+        ));
+    }
+    if target.exists() {
+        let existing = std::fs::read_to_string(&target).unwrap_or_default();
+        if existing == content {
+            return Ok(target);
+        }
+        let backup = target.with_extension("js.spicemanager.bak");
+        let _ = std::fs::copy(&target, backup);
+    }
+    std::fs::write(&target, content)?;
+    Ok(target)
 }
 
 pub fn apply_with_fallbacks() -> ApplyResult {

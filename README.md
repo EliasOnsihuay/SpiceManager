@@ -13,10 +13,10 @@ SpiceManager is not an official Spotify or Spicetify product and is not affiliat
 
 ## What It Does
 
-- Detects Spotify, Spicetify, Marketplace, adblock configuration, and compatibility state.
+- Detects Spotify, Spicetify, Marketplace, rxri adblockify extension/configuration, and compatibility state.
 - Installs, updates, repairs, and validates the Spotify + Spicetify ecosystem.
 - Tracks Spotify updates that may break Spicetify and uses compatibility hold mode to avoid repeated destructive apply attempts.
-- Treats Marketplace and adblock state as first-class managed features.
+- Treats Marketplace and rxri adblockify state as first-class managed features.
 - Checks and stages SpiceManager app updates from GitHub Releases.
 - Provides a Tauri desktop UI and a CLI for development, scripting, and diagnostics.
 
@@ -39,7 +39,7 @@ For most Windows users, the NSIS setup executable is recommended because it crea
 ## Workflows
 
 - `detect`: inspect the current environment and persist the latest state.
-- `install`: install missing Spicetify pieces, Marketplace, and adblock configuration where possible.
+- `install`: install missing Spicetify pieces, Marketplace, and rxri adblockify configuration where possible.
 - `update`: update Spicetify, repair Marketplace/adblock if needed, then validate.
 - `repair`: run restore/backup/apply fallback flows and re-check managed state.
 - `validate`: run a non-installing health check.
@@ -48,6 +48,10 @@ For most Windows users, the NSIS setup executable is recommended because it crea
 ## Compatibility Hold Mode
 
 Spotify can update before Spicetify supports the new version. SpiceManager stores the last known good Spotify + Spicetify state and recent apply failures. If a Spotify version change is followed by repeated failures or Marketplace/adblock regression, SpiceManager enters hold mode, preserves the desired managed state, and stops hammering `spicetify apply`. Recovery can later update Spicetify, repair Marketplace, restore adblock configuration, re-apply, validate, and clear hold mode.
+
+## Adblockify
+
+SpiceManager manages `adblock.js` from [`rxri/spicetify-extensions`](https://github.com/rxri/spicetify-extensions). The repair/install flow downloads the extension to the Spicetify `Extensions` folder, preserves an existing copy as `adblock.js.spicemanager.bak` when it changes, ensures `extensions = adblock.js`, and keeps Marketplace enabled through `custom_apps = marketplace`.
 
 ## App Self-Update
 

@@ -110,21 +110,31 @@ pub fn detect_adblock(spicetify: &SpicetifyState) -> AdblockState {
             notes: vec![],
         };
     };
-    let present = crate::utils::fs::path_contains(config, &extension_name);
+    let extension_path = config
+        .parent()
+        .map(|parent| parent.join("Extensions").join(&extension_name));
+    let config_present = crate::utils::fs::path_contains(config, &extension_name);
+    let file_present = extension_path.as_ref().is_some_and(|path| path.exists());
     AdblockState {
-        state: if present {
+        state: if config_present && file_present {
             ManagedFeatureState::Configured
+        } else if config_present || file_present {
+            ManagedFeatureState::Broken
         } else if config.exists() {
             ManagedFeatureState::Missing
         } else {
             ManagedFeatureState::Uncertain
         },
         extension_name,
-        config_entry_present: present,
-        warnings: if present {
+        config_entry_present: config_present,
+        warnings: if config_present && file_present {
             vec![]
+        } else if config_present && !file_present {
+            vec!["adblock.js is configured, but the extension file is missing.".into()]
+        } else if file_present && !config_present {
+            vec!["adblock.js exists, but is not listed in the Spicetify config.".into()]
         } else {
-            vec!["Adblock extension/config entry was not found.".into()]
+            vec!["rxri adblockify extension/config entry was not found.".into()]
         },
         notes: vec![],
     }

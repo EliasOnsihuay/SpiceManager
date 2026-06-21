@@ -1,6 +1,6 @@
 [package]
 name = "spicemanager"
-version = "0.1.1"
+version = "0.1.2"
 description = "Third-party utility for managing Spotify + Spicetify setups."
 authors = ["Elias Onsihuay <elias@kodhu.dev>"]
 edition = "2021"

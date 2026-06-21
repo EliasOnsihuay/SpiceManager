@@ -14,7 +14,7 @@ SpiceManager is a third-party desktop utility for managing Spotify + Spicetify s
 
 - Run `Install` when Spicetify is missing.
 - Run `Repair` when Marketplace or adblock is missing or broken.
-- Run `Repair` if Spotify opens to a black or broken Spicetify UI. Repair first runs `spicetify restore`, then restores Marketplace and the Marketplace adblock extension entry, then applies Spicetify again.
+- Run `Repair` if Spotify opens to a black or broken Spicetify UI. Repair first runs `spicetify restore`, then restores Marketplace, downloads/updates rxri `adblock.js`, ensures the extension entry, then applies Spicetify again.
 - Run `Validate` after Spotify updates.
 - Run `Recover` when compatibility hold mode is active and you are ready to try recovery.
 - Run `Check app updates` to check SpiceManager releases on GitHub.
