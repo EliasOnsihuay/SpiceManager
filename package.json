@@ -1,6 +1,6 @@
 {
   "name": "spicemanager",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Third-party utility for managing Spotify + Spicetify setups.",
   "author": "Elias Onsihuay / Kodhu Technologies",
@@ -24,6 +24,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc && vite build",
     "preview": "vite preview --host 127.0.0.1",
+    "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "check:rust": "cargo check --manifest-path src-tauri/Cargo.toml",
