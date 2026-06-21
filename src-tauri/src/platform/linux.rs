@@ -68,7 +68,9 @@ pub fn detect_spotify() -> Result<SpotifyState> {
         running,
         likely_usable_for_spicetify: matches!(
             install_kind,
-            SpotifyInstallKind::LinuxApt | SpotifyInstallKind::LinuxAur | SpotifyInstallKind::LinuxFlatpak
+            SpotifyInstallKind::LinuxApt
+                | SpotifyInstallKind::LinuxAur
+                | SpotifyInstallKind::LinuxFlatpak
         ),
         warnings,
         notes: vec![],

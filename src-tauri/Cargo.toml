@@ -1,6 +1,6 @@
 [package]
 name = "spicemanager"
-version = "0.1.0"
+version = "0.1.1"
 description = "Third-party utility for managing Spotify + Spicetify setups."
 authors = ["Elias Onsihuay <elias@kodhu.dev>"]
 edition = "2021"
@@ -12,11 +12,11 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "spicemanager"
-path = "src/bin/spicemanager.rs"
+path = "src/main.rs"
 
 [[bin]]
-name = "spicemanager-desktop"
-path = "src/main.rs"
+name = "spicemanager-cli"
+path = "src/bin/spicemanager.rs"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

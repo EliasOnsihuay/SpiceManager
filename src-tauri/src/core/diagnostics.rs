@@ -21,9 +21,10 @@ pub fn build(config: &AppConfig, store: &StateStore) -> Result<DiagnosticsReport
 
 pub fn export(config: &AppConfig, store: &StateStore) -> Result<PathBuf> {
     let report = build(config, store)?;
-    let file = config
-        .state_dir
-        .join(format!("diagnostics-{}.json", Utc::now().format("%Y%m%d-%H%M%S")));
+    let file = config.state_dir.join(format!(
+        "diagnostics-{}.json",
+        Utc::now().format("%Y%m%d-%H%M%S")
+    ));
     std::fs::write(&file, serde_json::to_string_pretty(&report)?)?;
     Ok(file)
 }

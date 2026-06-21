@@ -1,6 +1,6 @@
 {
   "name": "spicemanager",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Third-party utility for managing Spotify + Spicetify setups.",
   "author": "Elias Onsihuay / Kodhu Technologies",

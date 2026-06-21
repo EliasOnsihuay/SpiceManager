@@ -28,7 +28,13 @@ impl WorkflowEngine {
         self.workflow(WorkflowKind::Detect, |engine, previous| {
             let env = engine.detect_environment(previous.as_ref(), None)?;
             engine.store.save_environment(&env)?;
-            Ok((env, None, "Environment detection completed.".into(), vec![], vec![]))
+            Ok((
+                env,
+                None,
+                "Environment detection completed.".into(),
+                vec![],
+                vec![],
+            ))
         })
     }
 
@@ -39,18 +45,30 @@ impl WorkflowEngine {
             if !initial.spicetify.installed {
                 let result = spicetify::install_spicetify();
                 if !result.success {
-                    warnings.push(format!("Spicetify install did not complete: {}", result.stderr));
+                    warnings.push(format!(
+                        "Spicetify install did not complete: {}",
+                        result.stderr
+                    ));
                 }
             }
             let after_spicetify = engine.detect_environment(previous.as_ref(), None)?;
-            if !matches!(after_spicetify.marketplace.state, ManagedFeatureState::Installed) {
+            if !matches!(
+                after_spicetify.marketplace.state,
+                ManagedFeatureState::Installed
+            ) {
                 let result = spicetify::install_marketplace();
                 if !result.success {
-                    warnings.push(format!("Marketplace install did not complete: {}", result.stderr));
+                    warnings.push(format!(
+                        "Marketplace install did not complete: {}",
+                        result.stderr
+                    ));
                 }
             }
             if let Some(config_path) = &after_spicetify.spicetify.config_path {
-                if let Err(err) = spicetify::ensure_adblock_config(config_path, "adblock.js") {
+                if let Err(err) = spicetify::ensure_adblock_config(
+                    config_path,
+                    spicetify::MARKETPLACE_ADBLOCK_EXTENSION,
+                ) {
                     warnings.push(format!("Could not update adblock config: {err}"));
                 }
             }
@@ -62,7 +80,13 @@ impl WorkflowEngine {
             let mut env = engine.detect_environment(previous.as_ref(), Some(apply.success))?;
             env.spicetify.last_apply_summary = Some(apply.summary.clone());
             engine.store.save_environment(&env)?;
-            Ok((env, Some(apply), "Install workflow completed.".into(), warnings, errors))
+            Ok((
+                env,
+                Some(apply),
+                "Install workflow completed.".into(),
+                warnings,
+                errors,
+            ))
         })
     }
 
@@ -84,7 +108,13 @@ impl WorkflowEngine {
             let mut env = engine.detect_environment(Some(&repaired), Some(apply.success))?;
             env.spicetify.last_apply_summary = Some(apply.summary.clone());
             engine.store.save_environment(&env)?;
-            Ok((env, Some(apply), "Update workflow completed.".into(), warnings, errors))
+            Ok((
+                env,
+                Some(apply),
+                "Update workflow completed.".into(),
+                warnings,
+                errors,
+            ))
         })
     }
 
@@ -93,6 +123,13 @@ impl WorkflowEngine {
             let mut warnings = Vec::new();
             let initial = engine.detect_environment(previous.as_ref(), None)?;
             spicetify::require_spicetify_installed(initial.spicetify.installed)?;
+            let restore = spicetify::restore_spotify_ui();
+            if !restore.success {
+                warnings.push(format!(
+                    "Spotify UI restore did not complete before repair: {}",
+                    restore.stderr
+                ));
+            }
             let repaired = engine.repair_managed_config(&initial, &mut warnings)?;
             let apply = spicetify::apply_with_fallbacks();
             let mut errors = Vec::new();
@@ -102,7 +139,13 @@ impl WorkflowEngine {
             let mut env = engine.detect_environment(Some(&repaired), Some(apply.success))?;
             env.spicetify.last_apply_summary = Some(apply.summary.clone());
             engine.store.save_environment(&env)?;
-            Ok((env, Some(apply), "Repair workflow completed.".into(), warnings, errors))
+            Ok((
+                env,
+                Some(apply),
+                "Repair workflow completed.".into(),
+                warnings,
+                errors,
+            ))
         })
     }
 
@@ -164,7 +207,11 @@ impl WorkflowEngine {
         diagnostics::export(&self.config, &self.store)
     }
 
-    pub fn app_update_check(&self, owner: Option<String>, repo: Option<String>) -> Result<AppUpdateState> {
+    pub fn app_update_check(
+        &self,
+        owner: Option<String>,
+        repo: Option<String>,
+    ) -> Result<AppUpdateState> {
         let started_at = Utc::now();
         logging::log(&self.config, "app-update", "checking GitHub Releases")?;
         let owner = owner.unwrap_or_else(|| self.config.github_owner.clone());
@@ -195,7 +242,11 @@ impl WorkflowEngine {
 
     pub fn app_update_download(&self) -> Result<AppUpdateState> {
         let started_at = Utc::now();
-        logging::log(&self.config, "app-update", "downloading selected app update asset")?;
+        logging::log(
+            &self.config,
+            "app-update",
+            "downloading selected app update asset",
+        )?;
         let current = self.store.load_app_update()?;
         let in_progress = AppUpdateState {
             status: crate::models::AppUpdateStatusKind::DownloadInProgress,
@@ -217,7 +268,10 @@ impl WorkflowEngine {
             WorkflowKind::AppUpdateDownload,
             started_at,
             next.last_error.is_none(),
-            format!("App update download finished with status {:?}.", next.status),
+            format!(
+                "App update download finished with status {:?}.",
+                next.status
+            ),
             next.last_error.clone(),
         )?;
         Ok(next)
@@ -228,12 +282,18 @@ impl WorkflowEngine {
     }
 
     pub fn current_status(&self) -> Result<(Option<EnvironmentState>, AppUpdateState)> {
-        Ok((self.store.load_environment()?, self.store.load_app_update()?))
+        Ok((
+            self.store.load_environment()?,
+            self.store.load_app_update()?,
+        ))
     }
 
     fn workflow<F>(&self, kind: WorkflowKind, op: F) -> Result<WorkflowReport>
     where
-        F: FnOnce(&Self, Option<EnvironmentState>) -> Result<(
+        F: FnOnce(
+            &Self,
+            Option<EnvironmentState>,
+        ) -> Result<(
             EnvironmentState,
             Option<crate::models::ApplyResult>,
             String,
@@ -324,7 +384,10 @@ impl WorkflowEngine {
             }
         }
         if let Some(config_path) = &initial.spicetify.config_path {
-            if let Err(err) = spicetify::ensure_adblock_config(config_path, "adblock.js") {
+            if let Err(err) = spicetify::ensure_adblock_config(
+                config_path,
+                spicetify::MARKETPLACE_ADBLOCK_EXTENSION,
+            ) {
                 warnings.push(format!("Adblock repair failed: {err}"));
             }
         }

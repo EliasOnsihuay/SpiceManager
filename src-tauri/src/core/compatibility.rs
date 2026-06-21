@@ -40,7 +40,11 @@ pub fn evaluate(
         });
     } else if apply_failed {
         state.recent_apply_failures = state.recent_apply_failures.saturating_add(1);
-        if spotify_changed || marketplace_regressed || adblock_regressed || state.recent_apply_failures >= 2 {
+        if spotify_changed
+            || marketplace_regressed
+            || adblock_regressed
+            || state.recent_apply_failures >= 2
+        {
             state.hold_mode_active = true;
             state.status = CompatibilityStatus::HoldModeActive;
             state.reason = Some(reason(

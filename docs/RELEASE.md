@@ -11,10 +11,13 @@ npm run check
 npm run tauri:build
 ```
 
-On Windows, this produces:
+On Windows, this produces the desktop executable and installers:
 
+- `src-tauri/target/release/spicemanager.exe`
 - `src-tauri/target/release/bundle/nsis/SpiceManager_<version>_x64-setup.exe`
 - `src-tauri/target/release/bundle/msi/SpiceManager_<version>_x64_en-US.msi`
+
+`spicemanager.exe` is the Tauri desktop app. `spicemanager-cli.exe` is the CLI/dev binary and should not be used as the desktop shortcut target.
 
 ## GitHub Release Flow
 

@@ -4,8 +4,8 @@ pub mod windows;
 
 use crate::errors::Result;
 use crate::models::{
-    AdblockState, EnvironmentState, ManagedFeatureState, MarketplaceState, Platform, SpotifyState,
-    SpicetifyState,
+    AdblockState, EnvironmentState, ManagedFeatureState, MarketplaceState, Platform,
+    SpicetifyState, SpotifyState,
 };
 use chrono::Utc;
 
@@ -76,7 +76,9 @@ pub fn detect_marketplace(spicetify: &SpicetifyState) -> MarketplaceState {
             notes: vec![],
         };
     };
-    let base = config.parent().map(|p| p.join("CustomApps").join("marketplace"));
+    let base = config
+        .parent()
+        .map(|p| p.join("CustomApps").join("marketplace"));
     let path = base.filter(|p| p.exists());
     let config_mentions = crate::utils::fs::path_contains(config, "marketplace");
     let state = match (path.is_some(), config_mentions) {
@@ -108,8 +110,7 @@ pub fn detect_adblock(spicetify: &SpicetifyState) -> AdblockState {
             notes: vec![],
         };
     };
-    let present = crate::utils::fs::path_contains(config, &extension_name)
-        || crate::utils::fs::path_contains(config, "adblock");
+    let present = crate::utils::fs::path_contains(config, &extension_name);
     AdblockState {
         state: if present {
             ManagedFeatureState::Configured

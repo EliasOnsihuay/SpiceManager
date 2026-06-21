@@ -28,6 +28,8 @@ User-ready builds are published on GitHub Releases:
 
 Windows users can choose the NSIS setup executable or the MSI installer. macOS and Linux artifacts are prepared through the release workflow when tags are built on GitHub Actions.
 
+For most Windows users, the NSIS setup executable is recommended because it creates the normal Start Menu/Desktop integration and launches the desktop app. The raw executable is useful only as a portable/dev artifact.
+
 ## Supported Platforms
 
 - Windows: detects classic desktop Spotify and Microsoft Store Spotify. Classic desktop Spotify is preferred for Spicetify workflows. Store-only installs are reported with clear limitations.
@@ -54,25 +56,27 @@ SpiceManager app updates are separate from Spotify/Spicetify ecosystem updates. 
 Configure the release source with:
 
 ```powershell
-spicemanager app-update check --owner <github-owner> --repo <github-repo>
+spicemanager-cli app-update check --owner <github-owner> --repo <github-repo>
 ```
 
 ## CLI
 
 ```powershell
-spicemanager detect
-spicemanager install
-spicemanager update
-spicemanager repair
-spicemanager validate
-spicemanager status
-spicemanager doctor
-spicemanager app-update check
-spicemanager app-update download
-spicemanager app-update status
+spicemanager-cli detect
+spicemanager-cli install
+spicemanager-cli update
+spicemanager-cli repair
+spicemanager-cli validate
+spicemanager-cli status
+spicemanager-cli doctor
+spicemanager-cli app-update check
+spicemanager-cli app-update download
+spicemanager-cli app-update status
 ```
 
 CLI output clearly separates Spotify/Spicetify ecosystem state from SpiceManager app self-update state.
+
+The installed desktop app is `spicemanager.exe`. The CLI/dev binary is intentionally named `spicemanager-cli.exe` so desktop shortcuts launch the Tauri app, not the terminal CLI.
 
 ## Development
 
@@ -119,7 +123,7 @@ SpiceManager stores JSON state, workflow reports, compatibility data, app update
 Use the desktop Diagnostics section or:
 
 ```powershell
-spicemanager doctor
+spicemanager-cli doctor
 ```
 
 The diagnostics export includes environment summary, managed component state, compatibility hold reason, last known good state, recent workflow results, log excerpts, app version, app-update status, and timestamps.

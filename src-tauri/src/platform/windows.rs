@@ -22,7 +22,10 @@ pub fn detect_spotify() -> Result<SpotifyState> {
     );
     let store_marker = localappdata
         .as_ref()
-        .map(|p| p.join("Packages").join("SpotifyAB.SpotifyMusic_zpdnekdrzrea0"))
+        .map(|p| {
+            p.join("Packages")
+                .join("SpotifyAB.SpotifyMusic_zpdnekdrzrea0")
+        })
         .filter(|p| p.exists());
     let classic_real = classic_exe.is_some();
     let store_present = store_marker.is_some() || store_shim.is_some();
@@ -69,9 +72,15 @@ fn detect_version(exe: Option<&PathBuf>) -> Option<String> {
             &[
                 "-NoProfile",
                 "-Command",
-                &format!("(Get-Item -LiteralPath '{}').VersionInfo.ProductVersion", escaped),
+                &format!(
+                    "(Get-Item -LiteralPath '{}').VersionInfo.ProductVersion",
+                    escaped
+                ),
             ],
         );
-        result.success.then(|| result.stdout).filter(|s| !s.is_empty())
+        result
+            .success
+            .then(|| result.stdout)
+            .filter(|s| !s.is_empty())
     })
 }

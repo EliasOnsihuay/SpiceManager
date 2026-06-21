@@ -96,7 +96,10 @@ pub fn download_selected(config: &AppConfig, state: &AppUpdateState) -> Result<A
     let client = reqwest::blocking::Client::builder()
         .user_agent("SpiceManager app-update")
         .build()?;
-    let mut response = client.get(&asset.browser_download_url).send()?.error_for_status()?;
+    let mut response = client
+        .get(&asset.browser_download_url)
+        .send()?
+        .error_for_status()?;
     let mut file = std::fs::File::create(&target)?;
     let mut hasher = Sha256::new();
     let mut buffer = [0_u8; 16 * 1024];
