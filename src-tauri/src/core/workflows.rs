@@ -165,6 +165,7 @@ impl WorkflowEngine {
     }
 
     pub fn app_update_check(&self, owner: Option<String>, repo: Option<String>) -> Result<AppUpdateState> {
+        let started_at = Utc::now();
         logging::log(&self.config, "app-update", "checking GitHub Releases")?;
         let owner = owner.unwrap_or_else(|| self.config.github_owner.clone());
         let repo = repo.unwrap_or_else(|| self.config.github_repo.clone());
@@ -182,14 +183,43 @@ impl WorkflowEngine {
             },
         };
         self.store.save_app_update(&state)?;
+        self.append_app_update_workflow(
+            WorkflowKind::AppUpdateCheck,
+            started_at,
+            state.last_error.is_none(),
+            format!("App update check finished with status {:?}.", state.status),
+            state.last_error.clone(),
+        )?;
         Ok(state)
     }
 
     pub fn app_update_download(&self) -> Result<AppUpdateState> {
+        let started_at = Utc::now();
         logging::log(&self.config, "app-update", "downloading selected app update asset")?;
         let current = self.store.load_app_update()?;
-        let next = app_update::download_selected(&self.config, &current)?;
+        let in_progress = AppUpdateState {
+            status: crate::models::AppUpdateStatusKind::DownloadInProgress,
+            last_checked_at: Some(Utc::now()),
+            ..current.clone()
+        };
+        self.store.save_app_update(&in_progress)?;
+        let next = match app_update::download_selected(&self.config, &current) {
+            Ok(next) => next,
+            Err(err) => AppUpdateState {
+                status: crate::models::AppUpdateStatusKind::InstallFailed,
+                last_checked_at: Some(Utc::now()),
+                last_error: Some(err.to_string()),
+                ..current
+            },
+        };
         self.store.save_app_update(&next)?;
+        self.append_app_update_workflow(
+            WorkflowKind::AppUpdateDownload,
+            started_at,
+            next.last_error.is_none(),
+            format!("App update download finished with status {:?}.", next.status),
+            next.last_error.clone(),
+        )?;
         Ok(next)
     }
 
@@ -299,6 +329,31 @@ impl WorkflowEngine {
             }
         }
         self.detect_environment(Some(initial), None)
+    }
+
+    fn append_app_update_workflow(
+        &self,
+        kind: WorkflowKind,
+        started_at: chrono::DateTime<Utc>,
+        success: bool,
+        summary: String,
+        error: Option<String>,
+    ) -> Result<()> {
+        let report = WorkflowReport {
+            id: Uuid::new_v4(),
+            kind,
+            started_at,
+            ended_at: Utc::now(),
+            success,
+            summary: summary.clone(),
+            warnings: vec![],
+            errors: error.into_iter().collect(),
+            apply_result: None,
+            environment: self.store.load_environment()?,
+        };
+        self.store.append_workflow(&report)?;
+        logging::log(&self.config, "workflow", summary)?;
+        Ok(())
     }
 }
 

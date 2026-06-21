@@ -4,6 +4,21 @@
   "private": true,
   "description": "Third-party utility for managing Spotify + Spicetify setups.",
   "author": "Elias Onsihuay / Kodhu Technologies",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EliasOnsihuay/SpiceManager.git"
+  },
+  "homepage": "https://github.com/EliasOnsihuay/SpiceManager",
+  "bugs": {
+    "url": "https://github.com/EliasOnsihuay/SpiceManager/issues"
+  },
+  "keywords": [
+    "spicemanager",
+    "spicetify",
+    "spotify",
+    "tauri",
+    "desktop"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",

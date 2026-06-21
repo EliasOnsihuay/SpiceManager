@@ -20,6 +20,14 @@ SpiceManager is not an official Spotify or Spicetify product and is not affiliat
 - Checks and stages SpiceManager app updates from GitHub Releases.
 - Provides a Tauri desktop UI and a CLI for development, scripting, and diagnostics.
 
+## Downloads
+
+User-ready builds are published on GitHub Releases:
+
+- [Latest SpiceManager release](https://github.com/EliasOnsihuay/SpiceManager/releases/latest)
+
+Windows users can choose the NSIS setup executable or the MSI installer. macOS and Linux artifacts are prepared through the release workflow when tags are built on GitHub Actions.
+
 ## Supported Platforms
 
 - Windows: detects classic desktop Spotify and Microsoft Store Spotify. Classic desktop Spotify is preferred for Spicetify workflows. Store-only installs are reported with clear limitations.
@@ -97,6 +105,8 @@ Build release artifacts:
 ```powershell
 npm run tauri:build
 ```
+
+Release automation and manual publishing notes are in [`docs/RELEASE.md`](docs/RELEASE.md). A user guide is available in [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md).
 
 ## State, Logs, and Diagnostics
 
